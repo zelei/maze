@@ -3,7 +3,7 @@ var express = require('express');
 var ect = require('ect');
 var logger = require('winston');
 var passport = require('passport');
-var SignInService = env.require("/server/service/SignInService");
+//var SignInService = env.require("/server/service/SignInService");
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var templateDirectory = env.root + '/web/views';
@@ -43,11 +43,12 @@ app.configure(function() {
   app.use(app.router);  
 });
 
+/*
 passport.use(new GoogleStrategy({
     clientID: env.google.clientID,
     clientSecret: env.google.clientSecret,
     callbackURL: env.host + "/auth/google/callback"
-  }, SignInService.signIn));
+  }, SignInService.signIn));*/
 
 passport.serializeUser(function(user, done) {
     done(undefined, user);
