@@ -1,8 +1,20 @@
 <% extend 'templates/default.ect' %>
 
+<% block 'javascript' : %>
+
+<script src="static/client/Three.js"></script>
+<script src="static/client/Detector.js"></script>
+<script src="static/client/Stats.js"></script>
+<script src="static/client/OrbitControls.js"></script>
+<script src="static/client/THREEx.KeyboardState.js"></script>
+<script src="static/client/THREEx.FullScreen.js"></script>
+<script src="static/client/THREEx.WindowResize.js"></script>
+<script src="static/client/Maze.js"></script>
+
+<% end %>
+
 <% block 'body' : %>
-    
- INDEX
-    
+
+<div id="ThreeJS"></div>
 
 <% end %>
