@@ -68,12 +68,11 @@ var Main = function(screenWidth, screenHeight, container) {
 
         
         // LIGHT
-        var light = new THREE.PointLight(0xffffff);
+        var light = new THREE.PointLight(0xffffff, 1, 200);
         light.position.set(0,50,100);
         scene.add(light);
 
-        
-        var light2 = new THREE.AmbientLight(0x444444);
+        var light2 = new THREE.AmbientLight(0x404040);
         scene.add(light2);
         
         // create a small sphere to show position of light
@@ -86,29 +85,43 @@ var Main = function(screenWidth, screenHeight, container) {
         
 
         // Crate
-        var cubeGeometry = new THREE.CubeGeometry( 85, 85, 85 );
-        var crateTexture = new THREE.ImageUtils.loadTexture( 'static/img/crate.gif' );
-        var crateMaterial = new THREE.MeshLambertMaterial( { map: crateTexture, ambient: 0x0000ff} );
+
+        var materiaData = this.loadWallBlockMateriaData();
+       
+        var i;
+        for(i = -5;i < 5; i++) {
+            scene.add( this.createWallBlock(materiaData, i * 50, 0, 0) );
+        }
         
-        var crate = new THREE.Mesh( cubeGeometry.clone(), crateMaterial );
-        crate.position.set(-60, 50, 0);
-        scene.add( crate );	
-        
-        crate = new THREE.Mesh( cubeGeometry.clone(), crateMaterial );
-        crate.position.set(-160, 50, 0);
-        scene.add( crate );	
-    
-        crate = new THREE.Mesh( cubeGeometry.clone(), crateMaterial );
-        crate.position.set(40, 50, 0);
-        scene.add( crate );
+         for(i = -5;i < 5; i++) {
+            scene.add( this.createWallBlock(materiaData, i * 50, 0, -100) );
+        }
         
         rendererLoop(scene, camera, renderer, new Updater(controls, this.showStats(_container)));
     };
     
+    this.createWallBlock = function(material, x, y, z) {
+        var cubeGeometry = new THREE.CubeGeometry( 50, 50, 50 );
+        var block = new THREE.Mesh( cubeGeometry.clone(), material );
+        block.position.set(x, y + 25, z);
+        
+        block.castShadow = true;
+        block.receiveShadow = true;
+        
+        return block;
+    };
+    
+    this.loadWallBlockMateriaData = function() {
+        var crateTexture = new THREE.ImageUtils.loadTexture( 'static/img/crate.gif' );
+        var materia = new THREE.MeshLambertMaterial( { map: crateTexture, ambient: 0xffffff} );
+        
+        return materia;
+    };
 
     this.getRenderer = function(screenWidth, screenHeight) {
         var renderer = Detector.webgl ? new THREE.WebGLRenderer( {antialias:true} ) : new THREE.CanvasRenderer();
         renderer.setSize(screenWidth, screenHeight);
+        
         return renderer;
     };
     
@@ -133,7 +146,7 @@ var Main = function(screenWidth, screenHeight, container) {
         floor.position.y = -0.5;
         floor.rotation.x = Math.PI / 2;
         scene.add(floor);
-    }
+    };
 
 };
 
