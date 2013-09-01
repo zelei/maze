@@ -2,6 +2,7 @@ var Stats = Stats || {};
 var Detector = Detector || {};
 var THREE = THREE || {};
 var THREEx = THREEx || {};
+var MazeGenerator = MazeGenerator || {};
 
 // MAIN
 
@@ -23,13 +24,15 @@ var Updater = function(controls, stats) {
 };
 
 
-var Main = function(screenWidth, screenHeight, container) {
+var Main = function(screenWidth, screenHeight, container, maze) {
 
     var _screenWidth = screenWidth; 
     
     var _screenHeight = screenHeight;
     
     var _container = container;
+
+    var _maze = maze;
 
     var _viewAngle = 45;
     
@@ -49,7 +52,7 @@ var Main = function(screenWidth, screenHeight, container) {
         var camera = new THREE.PerspectiveCamera( _viewAngle, _aspect, _near, _far);
         var scene = new THREE.Scene();
         
-        camera.position.set(0,150,400);
+        camera.position.set(0, 1000, 0);
         scene.add(camera);
         
         camera.lookAt(scene.position);
@@ -62,14 +65,13 @@ var Main = function(screenWidth, screenHeight, container) {
         
 
         // FLOOR
-        this.showFlor(scene);
-
+     
         scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
         
         // LIGHT
         var light = new THREE.PointLight(0xffffff, 1, 200);
-        light.position.set(0,50,100);
+        light.position.set(50 ,25 ,50);
         scene.add(light);
 
         var light2 = new THREE.AmbientLight(0x404040);
@@ -84,17 +86,18 @@ var Main = function(screenWidth, screenHeight, container) {
         lightbulb.position = light.position;
         
 
-        // Crate
-
+        this.showFlor(scene, _maze[0].length, _maze.length);
+ 
         var materiaData = this.loadWallBlockMateriaData();
        
-        var i;
-        for(i = -5;i < 5; i++) {
-            scene.add( this.createWallBlock(materiaData, i * 50, 0, 0) );
-        }
+        var i, j;
         
-         for(i = -5;i < 5; i++) {
-            scene.add( this.createWallBlock(materiaData, i * 50, 0, -100) );
+        for (i = 0; i < _maze[0].length ; i++) {
+            for (j = 0; j  < _maze.length; j++) {
+                if(_maze[j][i] === 0) {
+                     scene.add( this.createWallBlock(materiaData, j * 50,  0,  i * 50) );    
+                }
+            }
         }
         
         rendererLoop(scene, camera, renderer, new Updater(controls, this.showStats(_container)));
@@ -136,15 +139,21 @@ var Main = function(screenWidth, screenHeight, container) {
         return stats;
     };
     
-    this.showFlor = function(scene) {
+    this.showFlor = function(scene, column, row) {
         var floorTexture = new THREE.ImageUtils.loadTexture( 'static/img/checkerboard.jpg' );
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
         floorTexture.repeat.set( 10, 10 );
+        
         var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-        var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+        var floorGeometry = new THREE.PlaneGeometry(row * 50, column * 50, 10, 10);
+        
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.position.y = -0.5;
+        floor.position.y = - 0.5;
+        floor.position.z = (column * 50) / 2 - 25;
+        floor.position.x = (row * 50) / 2 - 25;
+        
         floor.rotation.x = Math.PI / 2;
+        
         scene.add(floor);
     };
 
@@ -168,4 +177,9 @@ function rendererLoop(scene, camera, renderer, updater) {
 
 }
 
-new Main(1170, window.innerHeight, document.getElementById( 'ThreeJS' )).init();
+var generator = new MazeGenerator(5, 10);
+generator.display();
+
+var maze = generator.getMaze();
+
+new Main(1170, window.innerHeight, document.getElementById( 'ThreeJS' ), maze).init();

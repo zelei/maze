@@ -1,5 +1,8 @@
 var MazeGenerator = function (x, y) {
 
+    var WALL = 0;
+    var ROOM = 1;
+
     var Direction = function (bit, dx, dy) {
         this.bit = bit;
         this.dx = dx;
@@ -20,15 +23,12 @@ var MazeGenerator = function (x, y) {
     this.x = x;
     this.y = y;
     this.dirs = [N, S, E, W];
-    this.maze = new Array(this.x);
+    this.maze = initArray(this.x, this.y, 0);
+    this.bitMaze; 
 
-    var i, j;
-    for (i = 0; i < this.x; i++) {
-        this.maze[i] = new Array(this.y);
-        for (j = 0; j < this.y; j++) {
-            this.maze[i][j] = 0;
-        }
-    }
+    this.getMaze = function() {
+        return this.bitMaze;    
+    };
 
     this.display = function () {
         var i, j, line;
@@ -58,10 +58,10 @@ var MazeGenerator = function (x, y) {
 
         console.log(line + "+");
     };
-
-    var _this = this;
-
+    
     this.generateMaze = function (cx, cy) {
+
+        var _this = this;
 
         shuffle(this.dirs).forEach(function (dir) {
             var nx = cx + dir.dx;
@@ -83,8 +83,52 @@ var MazeGenerator = function (x, y) {
         return (v >= 0) && (v < upper);
     }
 
+    function initArray(x, y, v) {
+        
+        var array = new Array(x);
+        var i, j;
+        
+        for (i = 0; i < x; i++) {
+            array[i] = new Array(y);
+            for (j = 0; j < y; j++) {
+                array[i][j] = v;
+            }
+        }
+        
+        return array;    
+    }
+    
+    function convertToBitMaze(maze, x, y) {
+        var i, j;
+
+        var bitMaze = initArray(x * 2 + 1, y * 2 + 1, WALL);
+
+        for (i = 0; i < y; i++) {
+            for (j = 0; j < x; j++) {
+                
+                if((maze[j][i] & 1) === 0) {
+                    bitMaze[j*2][i*2] = WALL;
+                    bitMaze[j*2+1][i*2] = WALL;
+                } else {
+                    bitMaze[j*2][i*2] = WALL;
+                    bitMaze[j*2+1][i*2] = ROOM;
+                }
+
+                if((maze[j][i] & 8) === 0) {
+                    bitMaze[j*2][i*2+1] = WALL;
+                    bitMaze[j*2+1][i*2+1] = ROOM;
+                } else {
+                    bitMaze[j*2][i*2+1] = ROOM;
+                    bitMaze[j*2+1][i*2+1] = ROOM;
+                }
+                
+            }
+
+        }
+        
+        return bitMaze;
+    }
+    
     this.generateMaze(0, 0);
-
+    this.bitMaze = convertToBitMaze(this.maze, this.x, this.y);
 };
-
-new MazeGenerator(30, 10).display();
