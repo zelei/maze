@@ -21,7 +21,7 @@ app.configure(function() {
   // Express
   app.use(express.compress());
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  app.use("/static", express.static(env.root + '/web/resources', { maxAge: /*1000*60*60*24*30*12*/ 1000  }));
+  app.use("/static", express.static(env.root + '/web/resources', { maxAge: /*1000*60*60*24*30*12*/ 100  }));
   app.use(express.logger());
 
   app.use(express.cookieParser());
